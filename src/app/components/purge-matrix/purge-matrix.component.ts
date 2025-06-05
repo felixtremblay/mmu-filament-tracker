@@ -4,6 +4,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { FilamentDataService } from '../../services/filament-data.service';
 import { FilamentColor } from '../../models/filament.models';
@@ -17,6 +18,7 @@ import { FilamentColor } from '../../models/filament.models';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
+    MatTooltipModule,
     FormsModule
   ],
   templateUrl: './purge-matrix.component.html',
@@ -26,6 +28,11 @@ export class PurgeMatrixComponent {
   private dataService = inject(FilamentDataService);
   
   colors = computed(() => this.dataService.filamentColors());
+
+  getFilamentTooltip(color: FilamentColor): string {
+    const filamentType = color.filamentType?.fullName || `${color.filamentType?.brand} ${color.filamentType?.type}`;
+    return `${filamentType} - ${color.colorName}`;
+  }
 
   getPurgeVolume(fromColorId: string, toColorId: string): number {
     return this.dataService.getPurgeVolume(fromColorId, toColorId);

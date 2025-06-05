@@ -82,6 +82,15 @@ export class FilamentColorsComponent {
   colors = computed(() => this.dataService.filamentColors());
   filamentTypes = computed(() => this.dataService.filamentTypes());
   
+  // Sorted colors by filament type alphabetically
+  sortedColors = computed(() => {
+    return this.colors().sort((a, b) => {
+      const typeA = a.filamentType?.fullName || `${a.filamentType?.brand} ${a.filamentType?.type}` || '';
+      const typeB = b.filamentType?.fullName || `${b.filamentType?.brand} ${b.filamentType?.type}` || '';
+      return typeA.localeCompare(typeB);
+    });
+  });
+  
   displayedColumns: string[] = ['filamentType', 'colorName', 'color', 'actions'];
 
   addColor(): void {

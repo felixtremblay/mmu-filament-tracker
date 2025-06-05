@@ -15,7 +15,7 @@
           <tr>
             <th class="from-label">From</th>
             @for (color of colors(); track color.id) {
-              <th class="color-header">
+              <th class="color-header" [matTooltip]="getFilamentTooltip(color)">
                 <div class="color-circle" [style.background-color]="color.color"></div>
                 <span class="color-number">{{ $index + 1 }}</span>
               </th>
@@ -25,7 +25,7 @@
         <tbody>
           @for (fromColor of colors(); track fromColor.id) {
             <tr>
-              <td class="row-header">
+              <td class="row-header" [matTooltip]="getFilamentTooltip(fromColor)">
                 <div class="color-circle" [style.background-color]="fromColor.color"></div>
                 <span class="color-number">{{ $index + 1 }}</span>
               </td>
@@ -34,15 +34,13 @@
                   @if (fromColor.id === toColor.id) {
                     <div class="diagonal-cell"></div>
                   } @else {
-                    <mat-form-field appearance="outline" class="purge-input">
-                      <input 
-                        matInput 
-                        type="number" 
-                        [value]="getPurgeVolume(fromColor.id, toColor.id)"
-                        (input)="updatePurgeVolume(fromColor.id, toColor.id, $event)"
-                        min="0"
-                        max="999">
-                    </mat-form-field>
+                    <input 
+                      class="purge-input"
+                      type="text" 
+                      pattern="[0-9]*"
+                      [value]="getPurgeVolume(fromColor.id, toColor.id)"
+                      (input)="updatePurgeVolume(fromColor.id, toColor.id, $event)"
+                      maxlength="3">
                   }
                 </td>
               }
