@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ data.type ? 'Edit' : 'Add' }} Filament Type</h2>
+<mat-dialog-content>
+  <form [formGroup]="typeForm" class="type-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Brand</mat-label>
+      <input matInput formControlName="brand" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Type</mat-label>
+      <input matInput formControlName="type" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Full Name (Auto-generated)</mat-label>
+      <input matInput [value]="fullName()" readonly>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!typeForm.valid">
+    {{ data.type ? 'Update' : 'Add' }}
+  </button>
+</mat-dialog-actions>

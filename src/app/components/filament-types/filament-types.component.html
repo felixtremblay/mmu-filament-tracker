@@ -1,0 +1,62 @@
+<div class="filament-types-container">
+  <div class="header">
+    <h2>Filament Types</h2>
+    <button mat-raised-button color="primary" (click)="addType()">
+      <mat-icon>add</mat-icon>
+      Add Type
+    </button>
+  </div>
+
+  @if (types().length === 0) {
+    <mat-card class="no-data">
+      <mat-card-content>
+        <p>No filament types defined. Click "Add Type" to get started.</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="types-table-container">
+      <table mat-table [dataSource]="types()" class="types-table">
+        <!-- Brand Column -->
+        <ng-container matColumnDef="brand">
+          <th mat-header-cell *matHeaderCellDef>Brand</th>
+          <td mat-cell *matCellDef="let type">
+            <mat-form-field appearance="outline" class="brand-field">
+              <input matInput [value]="type.brand" (blur)="updateBrand(type.id, $event)">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let type">
+            <mat-form-field appearance="outline" class="type-field">
+              <input matInput [value]="type.type" (blur)="updateType(type.id, $event)">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Full Name Column -->
+        <ng-container matColumnDef="fullName">
+          <th mat-header-cell *matHeaderCellDef>Full Name</th>
+          <td mat-cell *matCellDef="let type">
+            <span class="full-name">{{ type.fullName || (type.brand + ' ' + type.type) }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let type">
+            <button mat-icon-button color="warn" (click)="deleteType(type.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  }
+</div>

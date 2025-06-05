@@ -1,0 +1,203 @@
+import { Component, computed, Inject, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { FilamentDataService } from '../../services/filament-data.service';
+import { FilamentType } from '../../models/filament.models';
+
+@Component({
+  selector: 'app-type-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule
+  ],
+  templateUrl: './type-dialog.component.html',
+  styles: [`
+    .type-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 300px;
+    }
+    
+    mat-dialog-content {
+      padding: 20px 24px;
+    }
+  `]
+})
+export class TypeDialogComponent {
+  typeForm: FormGroup;
+  
+  fullName = computed(() => {
+    const brand = this.typeForm.get('brand')?.value || '';
+    const type = this.typeForm.get('type')?.value || '';
+    return brand && type ? `${brand} ${type}` : '';
+  });
+
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<TypeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { type?: FilamentType }
+  ) {
+    this.typeForm = this.fb.group({
+      brand: [data.type?.brand || '', Validators.required],
+      type: [data.type?.type || '', Validators.required]
+    });
+  }
+
+  onSave(): void {
+    if (this.typeForm.valid) {
+      this.dialogRef.close(this.typeForm.value);
+    }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'app-filament-types',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
+  templateUrl: './filament-types.component.html',
+  styles: [`
+    .filament-types-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      margin: 0;
+      color: #333;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .types-table-container {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .types-table {
+      width: 100%;
+    }
+
+    .brand-field,
+    .type-field {
+      width: 100%;
+    }
+
+    .brand-field ::ng-deep .mat-mdc-form-field-infix,
+    .type-field ::ng-deep .mat-mdc-form-field-infix {
+      padding: 8px 0;
+    }
+
+    .full-name {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: #f5f5f5;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+      }
+      
+      .types-table {
+        font-size: 12px;
+      }
+    }
+  `]
+})
+export class FilamentTypesComponent {
+  private dataService = inject(FilamentDataService);
+  private dialog = inject(MatDialog);
+
+  types = computed(() => this.dataService.filamentTypes());
+  
+  displayedColumns: string[] = ['brand', 'type', 'fullName', 'actions'];
+
+  addType(): void {
+    const dialogRef = this.dialog.open(TypeDialogComponent, {
+      width: '400px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dataService.addFilamentType(result);
+      }
+    });
+  }
+
+  updateBrand(typeId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const brand = input.value.trim();
+    if (brand) {
+      this.dataService.updateFilamentType(typeId, { brand });
+    } else {
+      // Reset to original value if empty
+      const originalType = this.types().find(t => t.id === typeId);
+      if (originalType) {
+        input.value = originalType.brand;
+      }
+    }
+  }
+
+  updateType(typeId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const type = input.value.trim();
+    if (type) {
+      this.dataService.updateFilamentType(typeId, { type });
+    } else {
+      // Reset to original value if empty
+      const originalType = this.types().find(t => t.id === typeId);
+      if (originalType) {
+        input.value = originalType.type;
+      }
+    }
+  }
+
+  deleteType(typeId: string): void {
+    if (confirm('Are you sure you want to delete this filament type? This will also remove all related colors and purge matrix entries.')) {
+      this.dataService.deleteFilamentType(typeId);
+    }
+  }
+}

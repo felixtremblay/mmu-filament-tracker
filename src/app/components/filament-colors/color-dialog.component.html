@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>{{ data.color ? 'Edit' : 'Add' }} Filament Color</h2>
+<mat-dialog-content>
+  <form [formGroup]="colorForm" class="color-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Filament Type</mat-label>
+      <mat-select formControlName="filamentTypeId" required>
+        @for (type of filamentTypes(); track type.id) {
+          <mat-option [value]="type.id">{{ type.fullName || type.brand + ' ' + type.type }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Color Name</mat-label>
+      <input matInput formControlName="colorName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Color (Hex)</mat-label>
+      <input matInput formControlName="color" type="color" required>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!colorForm.valid">
+    {{ data.color ? 'Update' : 'Add' }}
+  </button>
+</mat-dialog-actions>

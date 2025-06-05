@@ -1,0 +1,232 @@
+import { Component, computed, Inject, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
+import { FilamentDataService } from '../../services/filament-data.service';
+import { FilamentColor } from '../../models/filament.models';
+
+@Component({
+  selector: 'app-color-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    MatButtonModule,
+    MatDialogModule
+  ],
+  templateUrl: './color-dialog.component.html',
+  styles: [`
+    .color-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 300px;
+    }
+    
+    mat-dialog-content {
+      padding: 20px 24px;
+    }
+  `]
+})
+export class ColorDialogComponent {
+  colorForm: FormGroup;
+  private dataService = inject(FilamentDataService);
+  filamentTypes = computed(() => this.dataService.filamentTypes());
+
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<ColorDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { color?: FilamentColor }
+  ) {
+    this.colorForm = this.fb.group({
+      filamentTypeId: [data.color?.filamentTypeId || '', Validators.required],
+      colorName: [data.color?.colorName || '', Validators.required],
+      color: [data.color?.color || '#FF0000', Validators.required]
+    });
+  }
+
+  onSave(): void {
+    if (this.colorForm.valid) {
+      this.dialogRef.close(this.colorForm.value);
+    }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'app-filament-colors',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule
+  ],
+  templateUrl: './filament-colors.component.html',
+  styles: [`
+    .filament-colors-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      margin: 0;
+      color: #333;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .colors-table-container {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .colors-table {
+      width: 100%;
+    }
+
+    .type-select {
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .color-name-field {
+      width: 100%;
+    }
+
+    .color-name-field ::ng-deep .mat-mdc-form-field-infix {
+      padding: 8px 0;
+    }
+
+    .color-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #ddd;
+      cursor: pointer;
+    }
+
+    .color-picker {
+      width: 50px;
+      height: 30px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: #f5f5f5;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+      }
+      
+      .colors-table {
+        font-size: 12px;
+      }
+    }
+  `]
+})
+export class FilamentColorsComponent {
+  private dataService = inject(FilamentDataService);
+  private dialog = inject(MatDialog);
+
+  colors = computed(() => this.dataService.filamentColors());
+  filamentTypes = computed(() => this.dataService.filamentTypes());
+  
+  displayedColumns: string[] = ['filamentType', 'colorName', 'color', 'actions'];
+
+  addColor(): void {
+    const dialogRef = this.dialog.open(ColorDialogComponent, {
+      width: '400px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dataService.addFilamentColor(result);
+      }
+    });
+  }
+
+  updateFilamentType(colorId: string, event: MatSelectChange): void {
+    const filamentTypeId = event.value;
+    this.dataService.updateFilamentColor(colorId, { filamentTypeId });
+  }
+
+  updateColorName(colorId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const colorName = input.value.trim();
+    if (colorName) {
+      this.dataService.updateFilamentColor(colorId, { colorName });
+    } else {
+      // Reset to original value if empty
+      const originalColor = this.colors().find(c => c.id === colorId);
+      if (originalColor) {
+        input.value = originalColor.colorName;
+      }
+    }
+  }
+
+  updateColor(colorId: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const color = input.value;
+    this.dataService.updateFilamentColor(colorId, { color });
+  }
+
+  deleteColor(colorId: string): void {
+    if (confirm('Are you sure you want to delete this color? This will also remove all related purge matrix entries.')) {
+      this.dataService.deleteFilamentColor(colorId);
+    }
+  }
+
+  openColorPicker(colorId: string): void {
+    const colorInput = document.querySelector(`#colorInput_${colorId}`) as HTMLInputElement;
+    if (colorInput) {
+      colorInput.click();
+    }
+  }
+}

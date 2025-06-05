@@ -1,0 +1,67 @@
+<div class="filament-colors-container">
+  <div class="header">
+    <h2>Filament Colors</h2>
+    <button mat-raised-button color="primary" (click)="addColor()">
+      <mat-icon>add</mat-icon>
+      Add Color
+    </button>
+  </div>
+
+  @if (colors().length === 0) {
+    <mat-card class="no-data">
+      <mat-card-content>
+        <p>No filament colors defined. Click "Add Color" to get started.</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="colors-table-container">
+      <table mat-table [dataSource]="colors()" class="colors-table">
+        <!-- Filament Type Column -->
+        <ng-container matColumnDef="filamentType">
+          <th mat-header-cell *matHeaderCellDef>Filament Type</th>
+          <td mat-cell *matCellDef="let color">
+            <mat-select [value]="color.filamentTypeId" (selectionChange)="updateFilamentType(color.id, $event)" class="type-select">
+              @for (type of filamentTypes(); track type.id) {
+                <mat-option [value]="type.id">{{ type.fullName || type.brand + ' ' + type.type }}</mat-option>
+              }
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- Color Name Column -->
+        <ng-container matColumnDef="colorName">
+          <th mat-header-cell *matHeaderCellDef>Color Name</th>
+          <td mat-cell *matCellDef="let color">
+            <mat-form-field appearance="outline" class="color-name-field">
+              <input matInput [value]="color.colorName" (blur)="updateColorName(color.id, $event)">
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Color Column -->
+        <ng-container matColumnDef="color">
+          <th mat-header-cell *matHeaderCellDef>Color</th>
+          <td mat-cell *matCellDef="let color">
+            <div class="color-display">
+              <div class="color-circle" [style.background-color]="color.color" (click)="openColorPicker(color.id)"></div>
+              <input type="color" [value]="color.color" (change)="updateColor(color.id, $event)" class="color-picker" #colorInput>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let color">
+            <button mat-icon-button color="warn" (click)="deleteColor(color.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  }
+</div>
