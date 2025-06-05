@@ -1,8 +1,6 @@
 
 # MMU Filament Tracker
 
-🚀 **Live Demo:** [felixtremblay.github.io/filament-tracker](https://felixtremblay.github.io/filament-tracker/)
-
 > ⚠️ **WORK IN PROGRESS** ⚠️  
 > This is an unfinished project that was mostly vibe-coded with AI assistance. Expect bugs, missing features, and questionable architectural decisions.
 
@@ -23,18 +21,9 @@ npm start
 Then go to `http://localhost:4200/`
 
 
-### Building for GitHub Pages
-To deploy to GitHub Pages, build the app into the `docs/` folder with the correct base path:
+### Building
 ```bash
-npm run build:pages
-```
-This will output the production build to the `docs/` folder, with URLs set up for GitHub Pages. Commit and push the `docs/` folder to your repository.
-
-Then, in your repository settings on GitHub, set **Pages** to serve from the `docs/` folder on the `main` branch.
-
-Your site will be available at:
-```
-https://<your-username>.github.io/filament-tracker/
+npm run build
 ```
 
 ### Local development

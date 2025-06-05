@@ -5,7 +5,6 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:pages": "ng build --configuration github-pages --output-path docs && (test -d docs/browser && (mv docs/browser/* docs/ && rmdir docs/browser) || true) && touch docs/.nojekyll",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
