@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,9 +27,35 @@ import { FilamentDataService } from '../services/filament-data.service';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent {
+export class MainComponent implements OnInit {
   private dataService = inject(FilamentDataService);
   private snackBar = inject(MatSnackBar);
+  
+  private readonly SELECTED_TAB_KEY = 'filament-tracker-selected-tab';
+  selectedTabIndex = signal(0);
+
+  ngOnInit(): void {
+    this.restoreSelectedTab();
+  }
+
+  onTabChange(index: number): void {
+    this.selectedTabIndex.set(index);
+    this.saveSelectedTab(index);
+  }
+
+  private saveSelectedTab(index: number): void {
+    localStorage.setItem(this.SELECTED_TAB_KEY, index.toString());
+  }
+
+  private restoreSelectedTab(): void {
+    const savedTab = localStorage.getItem(this.SELECTED_TAB_KEY);
+    if (savedTab !== null) {
+      const tabIndex = parseInt(savedTab, 10);
+      if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex <= 2) {
+        this.selectedTabIndex.set(tabIndex);
+      }
+    }
+  }
 
   exportConfiguration(): void {
     try {

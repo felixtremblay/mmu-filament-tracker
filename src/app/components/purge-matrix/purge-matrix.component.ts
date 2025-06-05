@@ -14,8 +14,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FilamentDataService } from '../../services/filament-data.service';
 import { FilamentColor } from '../../models/filament.models';
 import { FormControl } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
-import { Observable, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-purge-matrix',
@@ -41,6 +39,12 @@ import { Observable, combineLatest } from 'rxjs';
 export class PurgeMatrixComponent implements OnInit {
   private dataService = inject(FilamentDataService);
   
+  // LocalStorage keys for filter persistence
+  private readonly FILTER_STORAGE_KEYS = {
+    SHOW_ALL_FILAMENTS: 'purge-matrix-show-all-filaments',
+    SELECTED_SLOTS: 'purge-matrix-selected-slots'
+  };
+  
   // Existing computed properties
   colors = computed(() => this.dataService.filamentColors());
 
@@ -48,31 +52,59 @@ export class PurgeMatrixComponent implements OnInit {
   showAllFilaments = signal(true);
   selectedSlots = signal<(string | null)[]>([null, null, null, null, null]); // 5 MMU slots
   
-  // Form controls for autocomplete inputs
+  // Form controls for slot selection - now using FilamentColor objects directly
   slotControls = [
-    new FormControl(''),
-    new FormControl(''),
-    new FormControl(''),
-    new FormControl(''),
-    new FormControl('')
+    new FormControl<FilamentColor | null>(null),
+    new FormControl<FilamentColor | null>(null),
+    new FormControl<FilamentColor | null>(null),
+    new FormControl<FilamentColor | null>(null),
+    new FormControl<FilamentColor | null>(null)
   ];
 
-  // Filtered options for each slot based on input value
-  filteredOptions: Observable<FilamentColor[]>[] = [];
-
   ngOnInit(): void {
-    // Initialize filtered options for each slot
-    this.filteredOptions = this.slotControls.map((control, slotIndex) =>
-      control.valueChanges.pipe(
-        startWith(''),
-        map(value => {
-          const inputValue = typeof value === 'string' ? value : '';
-          return this.getFilteredColorsForSlot(slotIndex, inputValue);
-        })
-      )
-    );
+    // Restore filter state from localStorage
+    this.restoreFilterState();
+    
+    // Set up value change listeners to update selectedSlots when form controls change
+    this.slotControls.forEach((control, index) => {
+      control.valueChanges.subscribe(value => {
+        this.updateSlot(index, value?.id || null);
+      });
+    });
+
+    // Initialize form controls with any existing selected values
+    this.slotControls.forEach((control, index) => {
+      this.initializeSlotControl(index);
+    });
   }
-  
+
+  // Filter state persistence methods
+  private saveFilterState(): void {
+    localStorage.setItem(this.FILTER_STORAGE_KEYS.SHOW_ALL_FILAMENTS, this.showAllFilaments().toString());
+    localStorage.setItem(this.FILTER_STORAGE_KEYS.SELECTED_SLOTS, JSON.stringify(this.selectedSlots()));
+  }
+
+  private restoreFilterState(): void {
+    // Restore showAllFilaments
+    const savedShowAll = localStorage.getItem(this.FILTER_STORAGE_KEYS.SHOW_ALL_FILAMENTS);
+    if (savedShowAll !== null) {
+      this.showAllFilaments.set(savedShowAll === 'true');
+    }
+
+    // Restore selectedSlots
+    const savedSlots = localStorage.getItem(this.FILTER_STORAGE_KEYS.SELECTED_SLOTS);
+    if (savedSlots !== null) {
+      try {
+        const slots = JSON.parse(savedSlots);
+        if (Array.isArray(slots) && slots.length === 5) {
+          this.selectedSlots.set(slots);
+        }
+      } catch (error) {
+        console.warn('Failed to parse saved slot selection:', error);
+      }
+    }
+  }
+
   // Computed property for filtered colors based on slot selection with slot numbers
   displayColors = computed(() => {
     if (this.showAllFilaments()) {
@@ -109,34 +141,10 @@ export class PurgeMatrixComponent implements OnInit {
     return this.colors().filter(color => !selectedIds.includes(color.id));
   }
 
-  // Filter colors based on autocomplete input
-  getFilteredColorsForSlot(slotIndex: number, inputValue?: string) {
-    const searchValue = inputValue !== undefined ? inputValue.toLowerCase() : this.slotControls[slotIndex].value?.toLowerCase() || '';
-    const availableColors = this.getAvailableColorsForSlot(slotIndex);
-    
-    if (!searchValue) {
-      return availableColors;
-    }
-    
-    return availableColors.filter(color => {
-      const tooltip = this.getFilamentTooltip(color).toLowerCase();
-      return tooltip.includes(searchValue);
-    });
-  }
-
-  // Handle autocomplete selection
+  // Handle manual slot selection (from clear button)
   onSlotSelection(slotIndex: number, color: FilamentColor | null): void {
-    this.updateSlot(slotIndex, color?.id || null);
-    if (color) {
-      this.slotControls[slotIndex].setValue(this.getFilamentTooltip(color));
-    } else {
-      this.slotControls[slotIndex].setValue('');
-    }
-  }
-
-  // Display function for autocomplete
-  displayFilament(color: FilamentColor): string {
-    return color ? this.getFilamentTooltip(color) : '';
+    this.slotControls[slotIndex].setValue(color);
+    // The updateSlot will be called automatically via valueChanges subscription
   }
 
   // Update slot selection
@@ -144,6 +152,7 @@ export class PurgeMatrixComponent implements OnInit {
     const slots = [...this.selectedSlots()];
     slots[slotIndex] = colorId;
     this.selectedSlots.set(slots);
+    this.saveFilterState();
   }
 
   // Get the current selected color for a slot
@@ -158,14 +167,21 @@ export class PurgeMatrixComponent implements OnInit {
   initializeSlotControl(slotIndex: number): void {
     const selectedColor = this.getSelectedColorForSlot(slotIndex);
     if (selectedColor) {
-      this.slotControls[slotIndex].setValue(this.getFilamentTooltip(selectedColor));
+      this.slotControls[slotIndex].setValue(selectedColor);
     }
   }
 
   // Clear all slots
   clearAllSlots(): void {
     this.selectedSlots.set([null, null, null, null, null]);
-    this.slotControls.forEach(control => control.setValue(''));
+    this.slotControls.forEach(control => control.setValue(null));
+    this.saveFilterState();
+  }
+
+  // Handle show all filaments toggle
+  onShowAllFilamentsChange(showAll: boolean): void {
+    this.showAllFilaments.set(showAll);
+    this.saveFilterState();
   }
 
   getFilamentTooltip(color: FilamentColor): string {
@@ -197,5 +213,36 @@ export class PurgeMatrixComponent implements OnInit {
     if (confirm('This will set all purge volumes to the default value (65mm³). Do you want to continue?')) {
       this.dataService.setValuesFromConfiguration();
     }
+  }
+
+  // Display function for autocomplete
+  displayFilamentFn = (color: FilamentColor | null): string => {
+    return color ? this.getFilamentTooltip(color) : '';
+  };
+
+  // Get filtered colors for autocomplete with search functionality
+  getFilteredColorsForSlot(slotIndex: number): FilamentColor[] {
+    const control = this.slotControls[slotIndex];
+    const inputValue = control.value;
+    
+    // If the input value is a FilamentColor object, don't filter (user selected from dropdown)
+    if (inputValue && typeof inputValue === 'object' && 'id' in inputValue) {
+      return this.getAvailableColorsForSlot(slotIndex);
+    }
+    
+    // If it's a string, filter by that string
+    const searchTerm = (typeof inputValue === 'string' ? inputValue : '').toLowerCase();
+    const availableColors = this.getAvailableColorsForSlot(slotIndex);
+    
+    if (!searchTerm) {
+      return availableColors;
+    }
+    
+    return availableColors.filter(color => 
+      this.getFilamentTooltip(color).toLowerCase().includes(searchTerm) ||
+      color.colorName.toLowerCase().includes(searchTerm) ||
+      color.filamentType?.brand?.toLowerCase().includes(searchTerm) ||
+      color.filamentType?.type?.toLowerCase().includes(searchTerm)
+    );
   }
 }

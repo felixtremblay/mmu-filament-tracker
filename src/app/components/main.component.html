@@ -11,7 +11,7 @@
   </div>
 </mat-toolbar>
 
-<mat-tab-group>
+<mat-tab-group [selectedIndex]="selectedTabIndex()" (selectedTabChange)="onTabChange($event.index)">
   <mat-tab label="Purge Matrix">
     <div class="tab-content">
       <app-purge-matrix></app-purge-matrix>

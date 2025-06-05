@@ -24,8 +24,8 @@
       <div class="filter-content">
         <div class="filter-toggle">
           <mat-slide-toggle 
-            [(ngModel)]="showAllFilaments"
-            (change)="showAllFilaments.set($event.checked)">
+            [checked]="showAllFilaments()"
+            (change)="onShowAllFilamentsChange($event.checked)">
             Show all filaments
           </mat-slide-toggle>
         </div>
@@ -41,10 +41,26 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Slot {{ $index + 1 }}</mat-label>
                     <input 
-                      matInput 
+                      matInput
                       [formControl]="slotControls[$index]"
-                      [matAutocomplete]="autocomplete"
-                      placeholder="Type to search filaments...">
+                      [matAutocomplete]="auto"
+                      placeholder="Type to search...">
+                    <mat-autocomplete 
+                      #auto="matAutocomplete"
+                      [displayWith]="displayFilamentFn"
+                      (optionSelected)="onSlotSelection($index, $event.option.value)">
+                      <mat-option [value]="null">
+                        <em>None</em>
+                      </mat-option>
+                      @for (color of getFilteredColorsForSlot($index); track color.id) {
+                        <mat-option [value]="color">
+                          <div class="option-content">
+                            <div class="color-circle small" [style.background-color]="color.color"></div>
+                            {{ getFilamentTooltip(color) }}
+                          </div>
+                        </mat-option>
+                      }
+                    </mat-autocomplete>
                     <button 
                       matSuffix 
                       mat-icon-button 
@@ -53,24 +69,6 @@
                       aria-label="Clear">
                       <mat-icon>close</mat-icon>
                     </button>
-                    <mat-autocomplete 
-                      #autocomplete="matAutocomplete" 
-                      [displayWith]="displayFilament"
-                      (optionSelected)="onSlotSelection($index, $event.option.value)">
-                      @for (color of filteredOptions[$index] | async; track color.id) {
-                        <mat-option [value]="color">
-                          <div class="option-content">
-                            <div class="color-circle small" [style.background-color]="color.color"></div>
-                            {{ getFilamentTooltip(color) }}
-                          </div>
-                        </mat-option>
-                      }
-                      @if ((filteredOptions[$index] | async)?.length === 0) {
-                        <mat-option disabled>
-                          No filaments found
-                        </mat-option>
-                      }
-                    </mat-autocomplete>
                   </mat-form-field>
                 </div>
               }
