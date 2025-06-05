@@ -270,4 +270,60 @@ export class FilamentDataService {
       });
     }
   }
+
+  // Configuration Export/Import
+  exportConfiguration(): string {
+    const config = {
+      filamentTypes: this.filamentTypes(),
+      filamentColors: this.filamentColors(),
+      purgeMatrix: this.purgeMatrix(),
+      exportDate: new Date().toISOString(),
+      version: '1.0'
+    };
+    return JSON.stringify(config, null, 2);
+  }
+
+  importConfiguration(configJson: string): { success: boolean; message: string } {
+    try {
+      const config = JSON.parse(configJson);
+      
+      // Validate the configuration structure
+      if (!config.filamentTypes || !config.filamentColors || !config.purgeMatrix) {
+        return { success: false, message: 'Invalid configuration format. Missing required data.' };
+      }
+
+      // Clear existing data
+      this.filamentTypes.set([]);
+      this.filamentColors.set([]);
+      this.purgeMatrix.set([]);
+
+      // Import new data
+      this.filamentTypes.set(config.filamentTypes);
+      this.filamentColors.set(config.filamentColors);
+      this.purgeMatrix.set(config.purgeMatrix);
+
+      // Save to storage
+      this.saveToStorage('filamentTypes', config.filamentTypes);
+      this.saveToStorage('filamentColors', config.filamentColors);
+      this.saveToStorage('purgeMatrix', config.purgeMatrix);
+
+      return { success: true, message: 'Configuration imported successfully!' };
+    } catch (error) {
+      console.error('Error importing configuration:', error);
+      return { success: false, message: 'Invalid JSON format or corrupted data.' };
+    }
+  }
+
+  downloadConfigurationFile(): void {
+    const config = this.exportConfiguration();
+    const blob = new Blob([config], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `filament-tracker-config-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 }

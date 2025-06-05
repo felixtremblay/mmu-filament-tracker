@@ -1,5 +1,14 @@
 <mat-toolbar color="primary">
   <span>Filament Tracker</span>
+  <span class="spacer"></span>
+  <div class="toolbar-actions">
+    <button mat-icon-button (click)="exportConfiguration()" matTooltip="Export Configuration">
+      <mat-icon>download</mat-icon>
+    </button>
+    <button mat-icon-button (click)="importConfiguration()" matTooltip="Import Configuration">
+      <mat-icon>upload</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
 
 <mat-tab-group>

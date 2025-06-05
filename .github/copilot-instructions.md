@@ -34,3 +34,9 @@ This is an Angular webapp for tracking 3D printing filament purge volumes for Pr
 - Never use `git commit`, `git push`, or any git commands that modify the repository
 - Only use git commands for reading information (status, log, diff, etc.) if needed
 - The user prefers to review changes before committing them
+
+## Development Server
+- **IMPORTANT**: The Angular dev server (`ng serve` or `npm start`) automatically detects file changes and rebuilds
+- Do NOT restart the server for every change - it has hot reload capability
+- If a server is already running on the target port, use the existing server instead of starting a new one
+- Only restart the server if there are configuration changes or if explicitly requested
