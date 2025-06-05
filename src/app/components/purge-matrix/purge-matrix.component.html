@@ -49,9 +49,11 @@
                       #auto="matAutocomplete"
                       [displayWith]="displayFilamentFn"
                       (optionSelected)="onSlotSelection($index, $event.option.value)">
-                      <mat-option [value]="null">
-                        <em>None</em>
-                      </mat-option>
+                      @if (!isSearching($index) || shouldShowNoneInSearch($index)) {
+                        <mat-option [value]="null">
+                          <em>None</em>
+                        </mat-option>
+                      }
                       @for (color of getFilteredColorsForSlot($index); track color.id) {
                         <mat-option [value]="color">
                           <div class="option-content">

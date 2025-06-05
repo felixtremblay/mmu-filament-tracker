@@ -254,4 +254,27 @@ export class PurgeMatrixComponent implements OnInit {
       color.filamentType?.type?.toLowerCase().includes(searchTerm)
     );
   }
+
+  // Check if user is actively searching (has typed something)
+  isSearching(slotIndex: number): boolean {
+    const control = this.slotControls[slotIndex];
+    const inputValue = control.value;
+    
+    // Return true if there's a string value (user is typing)
+    return typeof inputValue === 'string' && (inputValue as string).trim().length > 0;
+  }
+
+  // Check if the search term matches "none"
+  shouldShowNoneInSearch(slotIndex: number): boolean {
+    const control = this.slotControls[slotIndex];
+    const inputValue = control.value;
+    
+    if (typeof inputValue === 'string') {
+      const searchTerm = (inputValue as string).toLowerCase().trim();
+      // Only match against "none" - check if "none" starts with the search term
+      return 'none'.startsWith(searchTerm) && searchTerm.length > 0;
+    }
+    
+    return false;
+  }
 }
