@@ -28,3 +28,9 @@ This is an Angular webapp for tracking 3D printing filament purge volumes for Pr
 - FilamentType: brand, type, fullName
 - FilamentColor: filamentType, colorName, color (hex)
 - PurgeMatrix: 2D array of purge volumes indexed by filament colors
+
+## Git Workflow
+- **IMPORTANT**: The user handles all git commits and pushes personally
+- Never use `git commit`, `git push`, or any git commands that modify the repository
+- Only use git commands for reading information (status, log, diff, etc.) if needed
+- The user prefers to review changes before committing them
