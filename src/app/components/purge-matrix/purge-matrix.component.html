@@ -1,7 +1,6 @@
 <div class="purge-matrix-container">
   <div class="header">
     <h2>Purge Matrix</h2>
-    <p class="subtitle">Extruder changed to</p>
   </div>
 
   <!-- Filter Controls -->
@@ -93,6 +92,7 @@
       <p>No filament colors defined. Please add some colors in the "Filament Colors" tab.</p>
     </div>
   } @else {
+    <p class="subtitle center" style="margin-top: 1rem;">Extruder changed to:</p>
     <div class="matrix-wrapper">
       <table class="purge-matrix-table">
         <thead>
@@ -135,22 +135,7 @@
     </div>
 
     <div class="footer">
-      <div class="legend">
-        <h3>Legend:</h3>
-        <div class="legend-item">
-          <div class="color-circle example" style="background-color: #FF6B35;"></div>
-          <span class="color-number">1</span>
-          @if (showAllFilaments()) {
-            <span class="legend-text">= Color 1 (corresponds to matrix row/column)</span>
-          } @else {
-            <span class="legend-text">= MMU Slot 1 (corresponds to matrix row/column)</span>
-          }
-        </div>
-        <div class="legend-item">
-          <div class="diagonal-cell example"></div>
-          <span class="legend-text">= Same color (no purge needed)</span>
-        </div>
-      </div>
+      <!-- legend removed as requested -->
       <p class="units">(all values in mm³)</p>
     </div>
   }
