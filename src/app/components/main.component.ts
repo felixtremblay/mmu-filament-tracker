@@ -25,24 +25,7 @@ import { FilamentDataService } from '../services/filament-data.service';
     FilamentTypesComponent
   ],
   templateUrl: './main.component.html',
-  styles: [`
-    .tab-content {
-      padding: 20px;
-    }
-    
-    mat-toolbar {
-      margin-bottom: 20px;
-    }
-
-    .spacer {
-      flex: 1 1 auto;
-    }
-
-    .toolbar-actions {
-      display: flex;
-      gap: 8px;
-    }
-  `]
+  styleUrls: ['./main.component.scss']
 })
 export class MainComponent {
   private dataService = inject(FilamentDataService);

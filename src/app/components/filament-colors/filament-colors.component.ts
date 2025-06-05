@@ -28,18 +28,7 @@ import { FilamentColor } from '../../models/filament.models';
     MatDialogModule
   ],
   templateUrl: './color-dialog.component.html',
-  styles: [`
-    .color-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-width: 300px;
-    }
-    
-    mat-dialog-content {
-      padding: 20px 24px;
-    }
-  `]
+  styleUrls: ['./filament-colors.component.scss']
 })
 export class ColorDialogComponent {
   colorForm: FormGroup;
@@ -84,91 +73,7 @@ export class ColorDialogComponent {
     MatOptionModule
   ],
   templateUrl: './filament-colors.component.html',
-  styles: [`
-    .filament-colors-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .header h2 {
-      margin: 0;
-      color: #333;
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 40px;
-    }
-
-    .colors-table-container {
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .colors-table {
-      width: 100%;
-    }
-
-    .type-select {
-      width: 100%;
-      font-size: 14px;
-    }
-
-    .color-name-field {
-      width: 100%;
-    }
-
-    .color-name-field ::ng-deep .mat-mdc-form-field-infix {
-      padding: 8px 0;
-    }
-
-    .color-display {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .color-circle {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px solid #ddd;
-      cursor: pointer;
-    }
-
-    .color-picker {
-      width: 50px;
-      height: 30px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .mat-mdc-row:hover {
-      background-color: #f5f5f5;
-    }
-
-    @media (max-width: 768px) {
-      .header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-      }
-      
-      .colors-table {
-        font-size: 12px;
-      }
-    }
-  `]
+  styleUrls: ['./filament-colors.component.scss']
 })
 export class FilamentColorsComponent {
   private dataService = inject(FilamentDataService);
