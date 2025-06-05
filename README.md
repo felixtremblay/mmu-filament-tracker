@@ -31,21 +31,6 @@ npm run build
 3. Set purge volumes in the matrix
 4. Done
 
-## Tech stack
-
-- Angular 20+ (because why not use the latest?)
-- Angular Material (for the components)
-- TypeScript
-- Local Storage (your data lives in your browser)
-
-## Known issues
-
-- Probably has bugs
-- Not thoroughly tested
-- UI could be better
-- Code architecture is questionable
-- Mobile experience might suck
-
 ## Contributing
 
 Feel free to fork and improve this. Pull requests welcome if you want to fix the mess.
