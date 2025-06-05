@@ -172,19 +172,269 @@
   margin-bottom: 10px;
 }
 
+/* Filter Panel Styles */
+.filter-panel {
+  width: 50% !important; /* Force 50% width */
+  max-width: 50% !important; /* Changed from 800px to 50% of page width */
+  min-width: 300px !important; /* Ensure minimum usable width */
+  margin: 0 auto 20px auto !important; /* Center the panel */
+  
+  .mat-expansion-panel-header {
+    height: 64px;
+  }
+  
+  .mat-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+/* Override Angular Material defaults */
+::ng-deep .filter-panel.mat-expansion-panel {
+  width: 50% !important;
+  max-width: 50% !important;
+  min-width: 300px !important;
+  margin: 0 auto 20px auto !important;
+}
+
+.filter-content {
+  padding: 16px; // Apply padding on all sides
+  display: flex; // Use flexbox for layout
+  flex-direction: column; // Stack children vertically
+  align-items: stretch; // Stretch children to fill width
+}
+
+.filter-toggle {
+  margin-bottom: 20px;
+
+  mat-slide-toggle {
+    .mat-slide-toggle-label {
+      font-weight: 500;
+    }
+  }
+}
+
+.slot-management {
+  width: 100%;
+  box-sizing: border-box;
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .slot-description {
+    color: #666;
+    margin: 0 0 20px 0;
+    font-size: 14px;
+  }
+}
+
+.slots-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.slot-selector {
+  width: 100%;
+  display: block; // Force block display
+  box-sizing: border-box;
+  margin-bottom: 4px;
+  
+  .mat-form-field {
+    width: 100%;
+    display: block; // Force block display
+    box-sizing: border-box;
+
+    .mat-mdc-text-field-wrapper {
+      .mat-mdc-form-field-input-control {
+        input[matInput] {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  /* Clear button styling */
+  button[matSuffix] {
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-circle.small {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.slot-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 500px; /* Match the slots container width */
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+/* Autocomplete panel options */
+::ng-deep .mat-mdc-autocomplete-panel {
+  .mat-mdc-option {
+    .option-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+    }
+
+    .color-circle.small {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      flex-shrink: 0;
+    }
+  }
+}
+
+/* Responsive adjustments for filter panel */
+@media (max-width: 1024px) {
+  .filter-panel,
+  ::ng-deep .filter-panel.mat-expansion-panel {
+    width: 70% !important;
+    max-width: 70% !important; /* 70% width on tablets */
+  }
+}
+
 @media (max-width: 768px) {
+  .filter-panel,
+  ::ng-deep .filter-panel.mat-expansion-panel {
+    width: 100% !important;
+    max-width: 100% !important; /* Full width on mobile */
+    min-width: unset !important;
+    margin: 0 0 20px 0 !important; /* Remove auto centering on mobile */
+  }
+  
+  .slots-container {
+    max-width: 100%; /* Full width on mobile */
+  }
+  
+  .slot-actions {
+    max-width: 100%; /* Full width on mobile */
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
   .purge-matrix-table {
     font-size: 12px;
   }
-  
+
   .color-circle {
     width: 16px;
     height: 16px;
   }
-  
+
   .purge-input {
     width: 70px;
   }
+}
+
+::ng-deep .mat-expansion-panel,
+::ng-deep .mat-expansion-panel-content,
+::ng-deep .mat-expansion-panel-body {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.slot-selector .mat-form-field {
+  display: block;
+}
+
+.slot-selector,
+.slot-selector .mat-form-field,
+.slot-selector .mat-form-field-infix {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 1 100% !important;
+  box-sizing: border-box;
+}
+
+::ng-deep .mat-form-field-infix {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+// Force mat-form-field to take full width
+::ng-deep .slot-selector .mat-mdc-form-field {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep .slot-selector .mat-mdc-text-field-wrapper,
+::ng-deep .slot-selector .mdc-text-field,
+::ng-deep .slot-selector .mdc-text-field--outlined {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+::ng-deep .slot-selector .mat-mdc-form-field-input-control {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+}
+
+// Alternative approach: force layout with specific selectors
+::ng-deep .slot-selector {
+  .mat-mdc-form-field {
+    width: 100% !important;
+    flex: 1 !important;
+  }
+  
+  .mat-mdc-text-field-wrapper {
+    width: 100% !important;
+    flex: 1 !important;
+  }
+  
+  .mdc-text-field {
+    width: 100% !important;
+    flex: 1 !important;
+  }
+}
+
+// Try forcing layout with specific selectors
+.slot-management .slots-container .slot-selector {
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
 

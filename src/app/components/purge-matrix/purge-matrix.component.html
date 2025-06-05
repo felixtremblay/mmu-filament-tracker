@@ -4,6 +4,90 @@
     <p class="subtitle">Extruder changed to</p>
   </div>
 
+  <!-- Filter Controls -->
+  @if (colors().length > 0) {
+    <mat-expansion-panel class="filter-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>filter_list</mat-icon>
+          Filter Options
+        </mat-panel-title>
+        <mat-panel-description>
+          @if (showAllFilaments()) {
+            Showing all {{ colors().length }} filaments
+          } @else {
+            Showing {{ displayColors().length }} selected filaments
+          }
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="filter-content">
+        <div class="filter-toggle">
+          <mat-slide-toggle 
+            [(ngModel)]="showAllFilaments"
+            (change)="showAllFilaments.set($event.checked)">
+            Show all filaments
+          </mat-slide-toggle>
+        </div>
+
+        @if (!showAllFilaments()) {
+          <div class="slot-management">
+            <h4>MMU Slot Assignment</h4>
+            <p class="slot-description">Assign filament colors to specific MMU slots. Only assigned slots will be shown in the matrix.</p>
+            
+            <div class="slots-container">
+              @for (slot of selectedSlots(); track $index) {
+                <div class="slot-selector">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Slot {{ $index + 1 }}</mat-label>
+                    <input 
+                      matInput 
+                      [formControl]="slotControls[$index]"
+                      [matAutocomplete]="autocomplete"
+                      placeholder="Type to search filaments...">
+                    <button 
+                      matSuffix 
+                      mat-icon-button 
+                      *ngIf="slot" 
+                      (click)="onSlotSelection($index, null)"
+                      aria-label="Clear">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                    <mat-autocomplete 
+                      #autocomplete="matAutocomplete" 
+                      [displayWith]="displayFilament"
+                      (optionSelected)="onSlotSelection($index, $event.option.value)">
+                      @for (color of filteredOptions[$index] | async; track color.id) {
+                        <mat-option [value]="color">
+                          <div class="option-content">
+                            <div class="color-circle small" [style.background-color]="color.color"></div>
+                            {{ getFilamentTooltip(color) }}
+                          </div>
+                        </mat-option>
+                      }
+                      @if ((filteredOptions[$index] | async)?.length === 0) {
+                        <mat-option disabled>
+                          No filaments found
+                        </mat-option>
+                      }
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+
+            <div class="slot-actions">
+              <button mat-stroked-button (click)="clearAllSlots()">
+                <mat-icon>clear_all</mat-icon>
+                Clear All
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-expansion-panel>
+  }
+
   @if (colors().length === 0) {
     <div class="no-data">
       <p>No filament colors defined. Please add some colors in the "Filament Colors" tab.</p>
@@ -14,22 +98,22 @@
         <thead>
           <tr>
             <th class="from-label">From</th>
-            @for (color of colors(); track color.id) {
+            @for (color of displayColors(); track color.id) {
               <th class="color-header" [matTooltip]="getFilamentTooltip(color)">
                 <div class="color-circle" [style.background-color]="color.color"></div>
-                <span class="color-number">{{ $index + 1 }}</span>
+                <span class="color-number">{{ color.slotNumber }}</span>
               </th>
             }
           </tr>
         </thead>
         <tbody>
-          @for (fromColor of colors(); track fromColor.id) {
+          @for (fromColor of displayColors(); track fromColor.id) {
             <tr>
               <td class="row-header" [matTooltip]="getFilamentTooltip(fromColor)">
                 <div class="color-circle" [style.background-color]="fromColor.color"></div>
-                <span class="color-number">{{ $index + 1 }}</span>
+                <span class="color-number">{{ fromColor.slotNumber }}</span>
               </td>
-              @for (toColor of colors(); track toColor.id) {
+              @for (toColor of displayColors(); track toColor.id) {
                 <td class="purge-cell">
                   @if (fromColor.id === toColor.id) {
                     <div class="diagonal-cell"></div>
@@ -56,7 +140,11 @@
         <div class="legend-item">
           <div class="color-circle example" style="background-color: #FF6B35;"></div>
           <span class="color-number">1</span>
-          <span class="legend-text">= Color 1 (corresponds to matrix row/column)</span>
+          @if (showAllFilaments()) {
+            <span class="legend-text">= Color 1 (corresponds to matrix row/column)</span>
+          } @else {
+            <span class="legend-text">= MMU Slot 1 (corresponds to matrix row/column)</span>
+          }
         </div>
         <div class="legend-item">
           <div class="diagonal-cell example"></div>
