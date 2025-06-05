@@ -277,10 +277,21 @@ export class FilamentDataService {
       filamentTypes: this.filamentTypes(),
       filamentColors: this.filamentColors(),
       purgeMatrix: this.purgeMatrix(),
+      purgeMatrixFilters: this.exportPurgeMatrixFilters(),
       exportDate: new Date().toISOString(),
       version: '1.0'
     };
     return JSON.stringify(config, null, 2);
+  }
+
+  private exportPurgeMatrixFilters(): { showAllFilaments: boolean; selectedSlots: (string | null)[] } {
+    const showAllFilaments = localStorage.getItem('purge-matrix-show-all-filaments');
+    const selectedSlots = localStorage.getItem('purge-matrix-selected-slots');
+    
+    return {
+      showAllFilaments: showAllFilaments ? JSON.parse(showAllFilaments) : true,
+      selectedSlots: selectedSlots ? JSON.parse(selectedSlots) : [null, null, null, null, null]
+    };
   }
 
   importConfiguration(configJson: string): { success: boolean; message: string } {
@@ -307,10 +318,24 @@ export class FilamentDataService {
       this.saveToStorage('filamentColors', config.filamentColors);
       this.saveToStorage('purgeMatrix', config.purgeMatrix);
 
+      // Import purge matrix filter settings if available
+      if (config.purgeMatrixFilters) {
+        this.importPurgeMatrixFilters(config.purgeMatrixFilters);
+      }
+
       return { success: true, message: 'Configuration imported successfully!' };
     } catch (error) {
       console.error('Error importing configuration:', error);
       return { success: false, message: 'Invalid JSON format or corrupted data.' };
+    }
+  }
+
+  private importPurgeMatrixFilters(filters: { showAllFilaments: boolean; selectedSlots: (string | null)[] }): void {
+    try {
+      localStorage.setItem('purge-matrix-show-all-filaments', JSON.stringify(filters.showAllFilaments));
+      localStorage.setItem('purge-matrix-selected-slots', JSON.stringify(filters.selectedSlots));
+    } catch (error) {
+      console.warn('Failed to import purge matrix filter settings:', error);
     }
   }
 

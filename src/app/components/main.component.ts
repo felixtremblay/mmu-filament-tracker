@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewChild } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,6 +30,8 @@ import { FilamentDataService } from '../services/filament-data.service';
 export class MainComponent implements OnInit {
   private dataService = inject(FilamentDataService);
   private snackBar = inject(MatSnackBar);
+  
+  @ViewChild(PurgeMatrixComponent) purgeMatrixComponent?: PurgeMatrixComponent;
   
   private readonly SELECTED_TAB_KEY = 'filament-tracker-selected-tab';
   selectedTabIndex = signal(0);
@@ -86,6 +88,14 @@ export class MainComponent implements OnInit {
           try {
             const content = e.target?.result as string;
             const result = this.dataService.importConfiguration(content);
+            
+            // If import was successful, refresh the purge matrix filter state
+            if (result.success && this.purgeMatrixComponent) {
+              // Use setTimeout to ensure the component has updated after the import
+              setTimeout(() => {
+                this.purgeMatrixComponent?.refreshFilterState();
+              }, 0);
+            }
             
             this.snackBar.open(result.message, 'Close', {
               duration: result.success ? 3000 : 5000,

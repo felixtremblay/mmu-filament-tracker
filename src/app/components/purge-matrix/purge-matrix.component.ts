@@ -184,6 +184,15 @@ export class PurgeMatrixComponent implements OnInit {
     this.saveFilterState();
   }
 
+  // Refresh filter state from localStorage (useful after configuration import)
+  refreshFilterState(): void {
+    this.restoreFilterState();
+    // Update form controls to reflect the restored state
+    this.slotControls.forEach((control, index) => {
+      this.initializeSlotControl(index);
+    });
+  }
+
   getFilamentTooltip(color: FilamentColor): string {
     const filamentType = color.filamentType?.fullName || `${color.filamentType?.brand} ${color.filamentType?.type}`;
     return `${filamentType} - ${color.colorName}`;
