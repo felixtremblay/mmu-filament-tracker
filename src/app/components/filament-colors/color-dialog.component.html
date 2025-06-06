@@ -34,10 +34,24 @@
       <input matInput formControlName="colorName" required>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Color (Hex)</mat-label>
-      <input matInput formControlName="color" type="color" required>
-    </mat-form-field>
+    <div class="color-picker-container">
+      <mat-form-field appearance="outline" class="color-hex-field">
+        <mat-label>Color (Hex)</mat-label>
+        <input matInput formControlName="color" placeholder="#FF0000" required>
+        <div 
+          matSuffix
+          class="color-preview-circle" 
+          [style.background-color]="colorForm.get('color')?.value"
+          (click)="openColorPicker()">
+        </div>
+      </mat-form-field>
+      <input 
+        #colorInput
+        type="color" 
+        class="hidden-color-input"
+        [value]="colorForm.get('color')?.value"
+        (change)="onColorChange($event)">
+    </div>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

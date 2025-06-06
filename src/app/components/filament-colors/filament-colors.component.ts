@@ -99,6 +99,21 @@ export class ColorDialogComponent {
     this.filamentTypeControl.setValue(null);
   }
 
+  // Open the native color picker
+  openColorPicker(): void {
+    const colorInput = document.querySelector('.hidden-color-input') as HTMLInputElement;
+    if (colorInput) {
+      colorInput.click();
+    }
+  }
+
+  // Handle color picker change
+  onColorChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const color = input.value;
+    this.colorForm.patchValue({ color });
+  }
+
   onSave(): void {
     if (this.colorForm.valid && this.filamentTypeControl.valid) {
       this.dialogRef.close(this.colorForm.value);
