@@ -1,6 +1,6 @@
 import { Component, computed, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -11,8 +11,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FilamentDataService } from '../../services/filament-data.service';
-import { FilamentColor } from '../../models/filament.models';
+import { FilamentColor, FilamentType } from '../../models/filament.models';
 
 @Component({
   selector: 'app-color-dialog',
@@ -25,13 +26,16 @@ import { FilamentColor } from '../../models/filament.models';
     MatSelectModule,
     MatOptionModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    MatAutocompleteModule,
+    MatIconModule
   ],
   templateUrl: './color-dialog.component.html',
   styleUrls: ['./filament-colors.component.scss']
 })
 export class ColorDialogComponent {
   colorForm: FormGroup;
+  filamentTypeControl = new FormControl<FilamentType | null>(null, Validators.required);
   private dataService = inject(FilamentDataService);
   filamentTypes = computed(() => this.dataService.filamentTypes());
 
@@ -40,15 +44,63 @@ export class ColorDialogComponent {
     private dialogRef: MatDialogRef<ColorDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { color?: FilamentColor }
   ) {
+    // Initialize the autocomplete control with existing value if editing
+    if (data.color?.filamentTypeId) {
+      const existingType = this.filamentTypes().find(type => type.id === data.color!.filamentTypeId);
+      this.filamentTypeControl.setValue(existingType || null);
+    }
+
     this.colorForm = this.fb.group({
       filamentTypeId: [data.color?.filamentTypeId || '', Validators.required],
       colorName: [data.color?.colorName || '', Validators.required],
       color: [data.color?.color || '#FF0000', Validators.required]
     });
+
+    // Update the form when autocomplete selection changes
+    this.filamentTypeControl.valueChanges.subscribe(type => {
+      this.colorForm.patchValue({
+        filamentTypeId: type?.id || ''
+      });
+    });
+  }
+
+  // Display function for autocomplete
+  displayFilamentTypeFn = (type: FilamentType | null): string => {
+    return type ? (type.fullName || `${type.brand} ${type.type}`) : '';
+  };
+
+  // Get filtered filament types for autocomplete with search functionality
+  getFilteredFilamentTypes(): FilamentType[] {
+    const inputValue = this.filamentTypeControl.value;
+    
+    // If the input value is a FilamentType object, don't filter (user selected from dropdown)
+    if (inputValue && typeof inputValue === 'object' && 'id' in inputValue) {
+      return this.filamentTypes();
+    }
+    
+    // If it's a string, filter by that string
+    const searchTerm = (typeof inputValue === 'string' ? inputValue : '').toLowerCase();
+    const availableTypes = this.filamentTypes();
+    
+    if (!searchTerm) {
+      return availableTypes;
+    }
+    
+    return availableTypes.filter(type => {
+      const displayName = this.displayFilamentTypeFn(type).toLowerCase();
+      return displayName.includes(searchTerm) ||
+             type.brand.toLowerCase().includes(searchTerm) ||
+             type.type.toLowerCase().includes(searchTerm);
+    });
+  }
+
+  // Clear the filament type selection
+  clearFilamentType(): void {
+    this.filamentTypeControl.setValue(null);
   }
 
   onSave(): void {
-    if (this.colorForm.valid) {
+    if (this.colorForm.valid && this.filamentTypeControl.valid) {
       this.dialogRef.close(this.colorForm.value);
     }
   }
@@ -96,7 +148,8 @@ export class FilamentColorsComponent {
   addColor(): void {
     const dialogRef = this.dialog.open(ColorDialogComponent, {
       width: '400px',
-      data: {}
+      data: {},
+      autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {

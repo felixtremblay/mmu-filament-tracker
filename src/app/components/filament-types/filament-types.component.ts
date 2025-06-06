@@ -27,12 +27,33 @@ import { FilamentType } from '../../models/filament.models';
     .type-form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       min-width: 300px;
+      margin-top: 16px;
+    }
+    
+    .type-form .mat-mdc-form-field {
+      min-height: 64px;
+    }
+    
+    .type-form .mat-mdc-form-field .mat-mdc-form-field-flex {
+      min-height: 56px;
+    }
+    
+    .type-form .mat-mdc-form-field .mat-mdc-form-field-infix {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+    
+    .type-form .mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline .mat-mdc-form-field-outline-start,
+    .type-form .mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline .mat-mdc-form-field-outline-notch,
+    .type-form .mat-mdc-form-field.mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline .mat-mdc-form-field-outline-end {
+      min-height: 56px;
     }
     
     mat-dialog-content {
       padding: 20px 24px;
+      padding-top: 48px;
     }
   `]
 })

@@ -70,10 +70,43 @@
 .color-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px; // Reduced spacing between form fields
   min-width: 300px;
+  margin-top: 16px; // Reduced spacing from dialog title
+
+  // Fix for autocomplete label being cut off - use same approach as purge matrix
+  .mat-mdc-form-field {
+    // Ensure minimum height for proper label display
+    min-height: 64px;
+    
+    .mat-mdc-form-field-flex {
+      min-height: 56px;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 14px;
+      padding-bottom: 14px;
+    }
+
+    // Specific fix for outline appearance autocomplete
+    &.mat-mdc-form-field-appearance-outline {
+      .mat-mdc-form-field-outline {
+        .mat-mdc-form-field-outline-start,
+        .mat-mdc-form-field-outline-notch,
+        .mat-mdc-form-field-outline-end {
+          min-height: 56px;
+        }
+      }
+    }
+  }
+
+  // Additional spacing for all form fields in the dialog
+  mat-form-field {
+    margin-bottom: 0; // Removed extra margin since we're using gap
+  }
 }
 
 mat-dialog-content {
   padding: 20px 24px;
+  padding-top: 48px; // Extra spacing between title and first form field to prevent label cutoff
 }

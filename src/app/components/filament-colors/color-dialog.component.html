@@ -3,11 +3,30 @@
   <form [formGroup]="colorForm" class="color-form">
     <mat-form-field appearance="outline">
       <mat-label>Filament Type</mat-label>
-      <mat-select formControlName="filamentTypeId" required>
-        @for (type of filamentTypes(); track type.id) {
-          <mat-option [value]="type.id">{{ type.fullName || type.brand + ' ' + type.type }}</mat-option>
+      <input 
+        matInput
+        [formControl]="filamentTypeControl"
+        [matAutocomplete]="auto"
+        placeholder="Type to search..."
+        required>
+      <mat-autocomplete 
+        #auto="matAutocomplete"
+        [displayWith]="displayFilamentTypeFn"
+        autoActiveFirstOption="false">
+        @for (type of getFilteredFilamentTypes(); track type.id) {
+          <mat-option [value]="type">
+            {{ type.fullName || type.brand + ' ' + type.type }}
+          </mat-option>
         }
-      </mat-select>
+      </mat-autocomplete>
+      <button 
+        matSuffix 
+        mat-icon-button 
+        *ngIf="filamentTypeControl.value" 
+        (click)="clearFilamentType()"
+        aria-label="Clear">
+        <mat-icon>close</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -23,7 +42,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!colorForm.valid">
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!colorForm.valid || !filamentTypeControl.valid">
     {{ data.color ? 'Update' : 'Add' }}
   </button>
 </mat-dialog-actions>
