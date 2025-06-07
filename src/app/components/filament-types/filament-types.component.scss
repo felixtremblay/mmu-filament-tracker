@@ -29,16 +29,125 @@
 
 .types-table {
   width: 100%;
+
+  // Ensure table cells are vertically centered
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    vertical-align: middle;
+    padding: 8px 16px; // Consistent cell padding
+    height: 48px; // Fixed height for consistency
+    min-height: 48px;
+  }
+
+  // Specific styling for cells containing form fields
+  .mat-mdc-cell {
+    height: 48px; // Fixed height for all table cells
+    min-height: 48px;
+    max-height: 48px;
+    vertical-align: middle;
+    display: table-cell; // Ensure proper table cell behavior
+
+    // Center form fields within cells with perfect alignment
+    &:has(.brand-field),
+    &:has(.type-field) {
+      padding: 4px 16px; // Minimal vertical padding
+      vertical-align: middle;
+      
+      // Ensure the cell content is perfectly centered
+      > * {
+        display: flex;
+        align-items: center;
+        height: 40px; // Match the form field height
+      }
+    }
+  }
 }
 
 .brand-field,
 .type-field {
   width: 100%;
-}
-
-.brand-field ::ng-deep .mat-mdc-form-field-infix,
-.type-field ::ng-deep .mat-mdc-form-field-infix {
-  padding: 8px 0;
+  
+  // Complete override for perfect table cell centering
+  ::ng-deep .mat-mdc-form-field-wrapper {
+    margin: 0;
+    padding: 0;
+    height: 40px; // Fixed height for consistency
+    display: flex;
+    align-items: center;
+  }
+  
+  ::ng-deep .mat-mdc-form-field-flex {
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    height: 40px; // Match wrapper height
+    min-height: 40px;
+  }
+  
+  ::ng-deep .mat-mdc-form-field-infix {
+    padding: 0;
+    margin: 0;
+    height: 38px; // Slightly less than flex to account for borders
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    border-top: none;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.2;
+  }
+  
+  // Completely remove subscript wrapper that adds bottom space
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  // Remove any floating label animations and spacing
+  ::ng-deep .mat-mdc-form-field-floating-label {
+    transform: none !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+  
+  // For outline appearance - ensure borders are centered
+  &.mat-mdc-form-field-appearance-outline {
+    ::ng-deep .mat-mdc-form-field-outline {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      
+      .mat-mdc-form-field-outline-start,
+      .mat-mdc-form-field-outline-notch,
+      .mat-mdc-form-field-outline-end {
+        border-width: 1px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+      }
+    }
+    
+    // Ensure consistent infix positioning
+    ::ng-deep .mat-mdc-form-field-infix {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+  }
+  
+  // Override any remaining Angular Material spacing
+  ::ng-deep .mat-mdc-select-value,
+  ::ng-deep .mdc-text-field__input,
+  ::ng-deep input {
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.2 !important;
+    height: auto !important;
+  }
 }
 
 .full-name {
