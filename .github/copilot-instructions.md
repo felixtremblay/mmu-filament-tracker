@@ -29,6 +29,11 @@ This is an Angular webapp for tracking 3D printing filament purge volumes for Pr
 - FilamentColor: filamentType, colorName, color (hex)
 - PurgeMatrix: 2D array of purge volumes indexed by filament colors
 
+## Angular Material Troubleshooting
+- **IMPORTANT**: If dealing with an Angular Material component, directive, or feature and the first attempt to fix an issue is unsuccessful, autonomously search the web for subsequent prompts about that specific Angular Material element
+- This ensures access to the most current documentation, examples, and community solutions for Angular Material issues
+- Apply this rule for any Angular Material-related problems including but not limited to: components, theming, layout, forms, navigation, and Material Design specifications
+
 ## Git Workflow
 - **IMPORTANT**: The user handles all git commits and pushes personally
 - Never use `git commit`, `git push`, or any git commands that modify the repository
